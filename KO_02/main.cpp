@@ -20,7 +20,7 @@ int closest_submarine(int degree, vector<int> subLocations);
 int distance_calc(int degree, int playerDegree);
 int enemy_distance();
 void kill_enemy(vector<int>& subLocations, int inputDegree);
-bool is_enemy_hit(int enemyDegree, int inputDegree);
+bool is_enemy_hit(int enemyLocation, int inputDegree);
 
 int main() {
 	while (!subLocations.empty()) {
@@ -28,12 +28,11 @@ int main() {
 
 		inputDegree = player_input(inputDegree); // player input
 
-		// breaking everything right now
-		playerDistanceToEnemy = inputDegree + enemyDistance;
+		playerDistanceToEnemy = enemyDistance;
 
-		kill_enemy(subLocations, playerDistanceToEnemy); // kill enemy if hit
-
-		playerDegree = inputDegree; // place player at location of input target
+		if (playerDistanceToEnemy / inputDegree == 1) {
+			kill_enemy(subLocations, playerDistanceToEnemy); // kill enemy if hit
+		}
 	}
 
 	return 0;
@@ -100,6 +99,7 @@ void kill_enemy(vector<int>& subLocations, int inputDegree) {
 	// iterate through each vector member and if it is in the location the player hit, erase it from the vector
 	for (vector<int>::iterator iter = subLocations.begin(); iter != subLocations.end();) {
 		if (is_enemy_hit(*iter, inputDegree)) {
+			playerDegree = closest_submarine(playerDegree, subLocations); // place player at location of input target
 			iter = subLocations.erase(iter);
 			cout << "Enemy destroyed!" << endl;
 		}
@@ -110,8 +110,9 @@ void kill_enemy(vector<int>& subLocations, int inputDegree) {
 }
 
 // check if enemy hit
-bool is_enemy_hit(int enemyDegree, int inputDegree) {
-	if (enemyDegree == inputDegree) {
+bool is_enemy_hit(int enemyLocation, int inputDegree) {
+	// need to find a way for this to work for every single member of the vector
+	if ((inputDegree + enemyLocation) - playerDistanceToEnemy == playerDistanceToEnemy) {
 		return true;
 	}
 
