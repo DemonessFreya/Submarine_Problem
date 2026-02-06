@@ -1,7 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <cmath>
-#include <cstdlib>
 using namespace std;
 
 // enemy sub locations in degrees
@@ -19,6 +17,7 @@ bool is_valid_degree(int degree);
 int closest_submarine(int degree, vector<int> subLocations);
 int distance_calc(int degree, int playerDegree);
 void enemy_distance();
+bool is_enemy_hit(int enemyDegree);
 
 int main() {
 	enemy_distance();
@@ -26,9 +25,21 @@ int main() {
 	std::cout << "Please enter an angle between 0-360 degrees" << std::endl;
 	do { std::cin >> inputDegree; } while (is_valid_degree(inputDegree)); // ask valid degree until given
 
-	playerDegree = inputDegree;
+	// iterate through each vector member and if it is in the location the player hit, erase it from the vector
+	for (vector<int>::iterator iter = subLocations.begin(); iter != subLocations.end();) {
+		if (is_enemy_hit(*iter)) {
+			iter = subLocations.erase(iter);
+		}
+		else {
+			++iter;
+		}
+	}
 
-	enemy_distance();
+	cout << subLocations[2] << endl;
+
+	enemy_distance(); // debug only, remove later
+
+	playerDegree = inputDegree; // place player at location of input target
 
 	return 0;
 }
@@ -47,11 +58,12 @@ int closest_submarine(int degree, vector<int> subLocations) {
 	int enemyDegree = 0;
 	int difference = degree - subLocations[0];
 
-	for (int i : subLocations) {
-		if (degree - i >= difference) {
-			enemyDegree = i;
+	// iterate through each vector member and decide which is closer via a difference variable
+	for (int location : subLocations) {
+		if (degree - location >= difference) {
+			enemyDegree = location;
 		}
-		difference = degree - i;
+		difference = degree - location;
 	}
 
 	return enemyDegree;
@@ -78,6 +90,15 @@ void enemy_distance() {
 	else {
 		std::cout << "How?" << std::endl;
 	}
+}
+
+// check if enemy hit
+bool is_enemy_hit(int enemyDegree) {
+	if (enemyDegree == playerDegree) {
+		return true;
+	}
+
+	return false;
 }
 
 // --Submarine game--
