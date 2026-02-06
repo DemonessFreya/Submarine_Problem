@@ -12,36 +12,38 @@ vector<int> subLocations {
 
 int playerDegree = 0; // current position
 int inputDegree = -1; // target position
+int playerDistanceToEnemy = 0;
 
+int player_input(int inputDegree);
 bool is_valid_degree(int degree);
 int closest_submarine(int degree, vector<int> subLocations);
 int distance_calc(int degree, int playerDegree);
-void enemy_distance();
-bool is_enemy_hit(int enemyDegree);
+int enemy_distance();
+void kill_enemy(vector<int>& subLocations, int inputDegree);
+bool is_enemy_hit(int enemyDegree, int inputDegree);
 
 int main() {
-	enemy_distance();
+	while (!subLocations.empty()) {
+		int enemyDistance = enemy_distance(); // show closest enemy location
 
-	std::cout << "Please enter an angle between 0-360 degrees" << std::endl;
-	do { std::cin >> inputDegree; } while (is_valid_degree(inputDegree)); // ask valid degree until given
+		inputDegree = player_input(inputDegree); // player input
 
-	// iterate through each vector member and if it is in the location the player hit, erase it from the vector
-	for (vector<int>::iterator iter = subLocations.begin(); iter != subLocations.end();) {
-		if (is_enemy_hit(*iter)) {
-			iter = subLocations.erase(iter);
-		}
-		else {
-			++iter;
-		}
+		// breaking everything right now
+		playerDistanceToEnemy = inputDegree + enemyDistance;
+
+		kill_enemy(subLocations, playerDistanceToEnemy); // kill enemy if hit
+
+		playerDegree = inputDegree; // place player at location of input target
 	}
 
-	cout << subLocations[2] << endl;
-
-	enemy_distance(); // debug only, remove later
-
-	playerDegree = inputDegree; // place player at location of input target
-
 	return 0;
+}
+
+int player_input(int inputDegree) {
+	cout << "Please enter an angle between 0-360 degrees" << endl;
+	do { std::cin >> inputDegree; } while (is_valid_degree(inputDegree)); // ask valid degree until given
+
+	return inputDegree;
 }
 
 // make sure player input fits within range 0-360
@@ -77,33 +79,39 @@ int distance_calc(int degree, int playerDegree) {
 }
 
 // display enemy distance to player
-void enemy_distance() {
+int enemy_distance() {
 	int enemyDegree = closest_submarine(playerDegree, subLocations);
-	int distance = distance_calc(enemyDegree, playerDegree);
+	int enemyDistance = distance_calc(enemyDegree, playerDegree);
 
-	if (distance < 0) {
-		std::cout << "Enemy " << abs(distance) << " degrees to the left" << std::endl;
+	if (enemyDistance < 0) {
+		std::cout << "Enemy " << abs(enemyDistance) << " degrees to the left" << std::endl;
 	}
-	else if (distance > 0) {
-		std::cout << "Enemy " << distance << " degrees to the right" << std::endl;
+	else if (enemyDistance > 0) {
+		std::cout << "Enemy " << enemyDistance << " degrees to the right" << std::endl;
 	}
 	else {
 		std::cout << "How?" << std::endl;
 	}
+
+	return enemyDistance;
 }
 
-// check if enemy hit
-bool is_enemy_hit(int enemyDegree) {
-	if (enemyDegree == playerDegree) {
-		return true;
+void kill_enemy(vector<int>& subLocations, int inputDegree) {
+	// iterate through each vector member and if it is in the location the player hit, erase it from the vector
+	for (vector<int>::iterator iter = subLocations.begin(); iter != subLocations.end();) {
+		if (is_enemy_hit(*iter, inputDegree)) {
+			iter = subLocations.erase(iter);
+			cout << "Enemy destroyed!" << endl;
+		}
+		else {
+			++iter;
+		}
 	}
-
-	return false;
 }
 
 // check if enemy hit
-bool is_enemy_hit(int enemyDegree) {
-	if (enemyDegree == playerDegree) {
+bool is_enemy_hit(int enemyDegree, int inputDegree) {
+	if (enemyDegree == inputDegree) {
 		return true;
 	}
 
