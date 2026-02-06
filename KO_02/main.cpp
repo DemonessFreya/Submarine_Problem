@@ -101,6 +101,15 @@ bool is_enemy_hit(int enemyDegree) {
 	return false;
 }
 
+// check if enemy hit
+bool is_enemy_hit(int enemyDegree) {
+	if (enemyDegree == playerDegree) {
+		return true;
+	}
+
+	return false;
+}
+
 // --Submarine game--
 //
 // (level I - one enemy unit)
