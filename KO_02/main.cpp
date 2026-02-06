@@ -1,24 +1,23 @@
 #include <iostream>
+#include <vector>
 #include <cmath>
 #include <cstdlib>
 using namespace std;
 
-// enemy sub locations
-enum SubLocations {
-	sub1 = 60,
-	sub2 = 120,
-	sub3 = 40,
-	sub4 = 210
+// enemy sub locations in degrees
+vector<int> subLocations {
+	60,
+	120,
+	40,
+	210
 };
 
-bool check_if_degree(int degree);
-int closest_submarine(int degree, SubLocations subLocations);
+bool is_valid_degree(int degree);
+int closest_submarine(int degree, vector<int> subLocations);
 int distance_calc(int degree, int playerDegree);
 int enemy_distance();
 
 int main() {
-	SubLocations subLocations = sub1;
-
 	int playerDegree = 0; // current position
 	int inputDegree = -1; // target position
 
@@ -29,14 +28,14 @@ int main() {
 		std::cout << "Enemy " << abs(distance) << " degrees to the left" << std::endl;
 	}
 	else if (distance > 0) {
-		std::cout << "Enemy " << distance << " to the right" << std::endl;
+		std::cout << "Enemy " << distance << " degrees to the right" << std::endl;
 	}
 	else {
 		std::cout << "How?" << std::endl;
 	}
 
 	std::cout << "Please enter an angle between 0-360 degrees" << std::endl;
-	while (check_if_degree(inputDegree)) { std::cin >> inputDegree; }
+	do { std::cin >> inputDegree; } while (is_valid_degree(inputDegree)); // ask valid degree until given
 
 	playerDegree = inputDegree;
 
@@ -45,34 +44,24 @@ int main() {
 }
 
 // make sure player input fits within range 0-360
-bool check_if_degree(int degree) {
+bool is_valid_degree(int degree) {
 	bool degreeCheck = false;
 	degreeCheck = ((degree >= 0) && (degree <= 360));
-	cout << "Please enter valid number between 0-360." << endl;
+	if (!degreeCheck) cout << "Please enter valid number between 0-360." << endl; // only send when invalid degree
 
-	return degreeCheck;
+	return !degreeCheck; // return false to break loop
 }
 
 // find which enemy is closest to player
-int closest_submarine(int degree, SubLocations subLocations) {
+int closest_submarine(int degree, vector<int> subLocations) {
 	int enemyDegree = 0;
-	int difference = 0;
+	int difference = degree - subLocations[0];
 
-	enemyDegree = sub1;
-	difference = degree - sub1;
-
-	if (degree - sub2 >= difference) {
-		enemyDegree = sub2;
-	}
-	difference = degree - sub2;
-
-	if (degree - sub3 >= difference) {
-		enemyDegree = sub3;
-	}
-	difference = degree - sub3;
-
-	if (degree - sub4 >= difference) {
-		enemyDegree = sub4;
+	for (int i : subLocations) {
+		if (degree - i >= difference) {
+			enemyDegree = i;
+		}
+		difference = degree - i;
 	}
 
 	return enemyDegree;
