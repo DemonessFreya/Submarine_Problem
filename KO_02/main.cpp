@@ -89,17 +89,16 @@ int enemy_distance() {
 		std::cout << "Enemy " << enemyDistance << " degrees to the right" << std::endl;
 	}
 	else {
-		std::cout << "How?" << std::endl;
+		std::cout << "Error" << std::endl;
 	}
 
 	return enemyDistance;
 }
 
 void kill_enemy(vector<int>& subLocations, int inputDegree) {
-	// iterate through each vector member and if it is in the location the player hit, erase it from the vector
 	for (vector<int>::iterator iter = subLocations.begin(); iter != subLocations.end();) {
 		if (is_enemy_hit(*iter, inputDegree)) {
-			playerDegree = closest_submarine(playerDegree, subLocations); // place player at location of input target
+			playerDegree = *iter; // move player to the destroyed enemy's absolute location
 			iter = subLocations.erase(iter);
 			cout << "Enemy destroyed!" << endl;
 		}
@@ -109,14 +108,10 @@ void kill_enemy(vector<int>& subLocations, int inputDegree) {
 	}
 }
 
-// check if enemy hit
+// has the enemy been hit by player
 bool is_enemy_hit(int enemyLocation, int inputDegree) {
-	// need to find a way for this to work for every single member of the vector
-	if ((inputDegree + enemyLocation) - playerDistanceToEnemy == playerDistanceToEnemy) {
-		return true;
-	}
-
-	return false;
+	int requiredRotation = distance_calc(enemyLocation, playerDegree); // check enemy hit relative to player location
+	return inputDegree == requiredRotation;
 }
 
 // --Submarine game--
